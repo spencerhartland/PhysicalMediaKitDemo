@@ -1,0 +1,15 @@
+{
+  "originHash" : "910c9dee1bf8ed37470ac263e0d6dbac93f940442010be130fd9aa4a73ed623e",
+  "pins" : [
+    {
+      "identity" : "physicalmediakit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/spencerhartland/PhysicalMediaKit",
+      "state" : {
+        "branch" : "main",
+        "revision" : "bf0ecb8333cbc0f2ea7b558cee30a778a2d85224"
+      }
+    }
+  ],
+  "version" : 3
+}
