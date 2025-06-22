@@ -15,44 +15,30 @@ fileprivate enum MediaType: String {
 }
 
 struct PhysicalMediaKitDemoView: View {
-    private let viewTitle = "PhysicalMediaKit Demo"
-    private let mediaTypePickerTitle = "Media Type"
-    private let modelReloadLabelText = "Loading model..."
-    private let modelReloadSymbolName = "progress.indicator"
-    private let albumArtworkURLLabelText = "Album Artwork URL"
-    private let albumArtworkURLPromptText = "https:/example.com/artwork"
-    private let albumArtworkURLSymbolName = "globe"
-    private let mediaColorLabelText = "Media Color"
-    private let mediaOpacityLabelText = "Media Opacity"
-    private let modelScaleLabelText = "Model Scale"
-    
     @State private var albumArtURLString = "https://f4.bcbits.com/img/a3629485078_10.jpg"
     @State private var selectedMediaType: MediaType = .vinylRecord
     @State private var mediaColor: Color = .pink
     @State private var mediaOpacity: Float = 0.5
     @State private var modelScale: Float = 0.8
-    @State private var modelRequiresReload = false
     
     var body: some View {
         VStack {
-            Text(viewTitle)
+            Text("PhysicalMediaKit Demo")
                 .font(.body.bold())
             
-            Picker(mediaTypePickerTitle, selection: $selectedMediaType) {
+            Picker("Media Type", selection: $selectedMediaType) {
                 Text(MediaType.vinylRecord.rawValue).tag(MediaType.vinylRecord)
                 Text(MediaType.compactDisc.rawValue).tag(MediaType.compactDisc)
                 Text(MediaType.compactCassette.rawValue).tag(MediaType.compactCassette)
             }
             .pickerStyle(.segmented)
             
-            if let albumArtURL = URL(string: albumArtURLString),
-               modelRequiresReload != true {
+            if let albumArtURL = URL(string: albumArtURLString) {
                 switch self.selectedMediaType {
                 case .vinylRecord:
                     PhysicalMedia.vinylRecord(
                         albumArtURL: albumArtURL,
                         vinylColor: mediaColor,
-                        vinylOpacity: mediaOpacity,
                         scale: modelScale
                     )
                 case .compactDisc:
@@ -64,22 +50,20 @@ struct PhysicalMediaKitDemoView: View {
                     PhysicalMedia.compactCassette(
                         albumArtURL: albumArtURL,
                         cassetteColor: mediaColor,
-                        cassetteOpacity: mediaOpacity,
                         scale: modelScale
                     )
                 }
             } else {
                 Spacer()
-                Label(modelReloadLabelText, systemImage: modelReloadSymbolName)
-                    .symbolEffect(.variableColor.iterative)
+                Label("Invalid Album Art URL", systemImage: "globe")
                 Spacer()
             }
             
             VStack {
                 VStack(alignment: .leading) {
-                    Label(albumArtworkURLLabelText, systemImage: albumArtworkURLSymbolName)
+                    Label("Album Artwork URL", systemImage: "globe")
                         .font(.caption.bold())
-                    TextField(albumArtworkURLLabelText, text: $albumArtURLString, prompt: Text(albumArtworkURLPromptText))
+                    TextField("Album Artwork URL", text: $albumArtURLString, prompt: Text("https:/example.com/artwork"))
                         .padding(.horizontal)
                         .padding(.vertical, 6)
                         .background(Color(UIColor.systemFill))
@@ -90,26 +74,16 @@ struct PhysicalMediaKitDemoView: View {
                 .cornerRadius(8)
                 
                 if selectedMediaType != .compactDisc {
-                    ColorPicker(mediaColorLabelText, selection: $mediaColor)
+                    ColorPicker("Media Color", selection: $mediaColor, supportsOpacity: true)
                         .padding(.horizontal)
                         .padding(.vertical, 6)
                         .background(Color(UIColor.secondarySystemBackground))
                         .cornerRadius(8)
                         .font(.caption.bold())
-                    
-                    VStack(alignment: .leading) {
-                        Text(mediaOpacityLabelText)
-                            .font(.caption.bold())
-                        Slider(value: $mediaOpacity, in: 0.0...1.0)
-                    }
-                    .padding([.top, .horizontal])
-                    .padding(.bottom, 6)
-                    .background(Color(UIColor.secondarySystemBackground))
-                    .cornerRadius(8)
                 }
                 
                 VStack(alignment: .leading) {
-                    Text(modelScaleLabelText)
+                    Text("Model Scale")
                         .font(.caption.bold())
                     Slider(value: $modelScale, in: 0.0...1.0)
                 }
@@ -120,23 +94,6 @@ struct PhysicalMediaKitDemoView: View {
             }
         }
         .padding()
-        .onChange(of: albumArtURLString) { _, _ in
-            modelRequiresReload = true
-        }
-        .onChange(of: mediaColor) { _, _ in
-            modelRequiresReload = true
-        }
-        .onChange(of: mediaOpacity) { _, _ in
-            modelRequiresReload = true
-        }
-        .onChange(of: modelScale) { _, _ in
-            modelRequiresReload = true
-        }
-        .onChange(of: modelRequiresReload) { _, _ in
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                modelRequiresReload = false
-            }
-        }
     }
 }
 
